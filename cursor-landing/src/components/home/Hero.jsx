@@ -1,3 +1,8 @@
+/**
+ * Hero section component for the home page
+ * 
+ * @returns {JSX.Element} Hero component
+ */
 const Hero = () => {
   return (
     <section className="pt-32 pb-20 px-6">

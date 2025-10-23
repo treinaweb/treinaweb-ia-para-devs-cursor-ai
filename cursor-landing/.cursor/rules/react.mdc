@@ -1,0 +1,7 @@
+---
+globs: *.tsx,*jsx
+alwaysApply: false
+---
+Sempre utilize hooks customizados para separar regras de negocio de código voltado para renderização, esses hooks devem ser criados na pasta hooks seguindo uma hierarquia baseada na página, ex.: hooks/home/useHome.js.
+
+Os componentes devem ser criados em pastas especifidas das páginas aos quais são utilizados, ex.: components/home/Hero.jsx, components/shared/Header.jsx.

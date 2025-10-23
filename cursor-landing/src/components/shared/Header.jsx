@@ -1,8 +1,19 @@
 import { Link, useLocation } from 'react-router-dom';
 
+/**
+ * Header component with navigation and active route highlighting
+ * 
+ * @returns {JSX.Element} Header component
+ */
 const Header = () => {
   const location = useLocation();
 
+  /**
+   * Generates CSS classes for navigation links based on active state
+   * 
+   * @param {string} path - The route path to check
+   * @returns {string} CSS classes for the link
+   */
   const getLinkClasses = (path) => {
     const isActive = location.pathname === path;
     return `relative font-medium transition ${
@@ -29,6 +40,9 @@ const Header = () => {
             </Link>
             <Link to="/sobre" className={getLinkClasses('/sobre')}>
               Sobre
+            </Link>
+            <Link to="/faq" className={getLinkClasses('/faq')}>
+              FAQ
             </Link>
           </div>
           

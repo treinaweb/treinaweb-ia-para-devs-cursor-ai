@@ -1,3 +1,8 @@
+/**
+ * Features section component displaying product features
+ * 
+ * @returns {JSX.Element} Features component
+ */
 const Features = () => {
   const features = [
     {

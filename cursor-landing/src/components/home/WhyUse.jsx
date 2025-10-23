@@ -1,3 +1,8 @@
+/**
+ * WhyUse section component explaining reasons to use the product
+ * 
+ * @returns {JSX.Element} WhyUse component
+ */
 const WhyUse = () => {
   const reasons = [
     {

@@ -1,3 +1,8 @@
+/**
+ * Pricing section component displaying subscription plans
+ * 
+ * @returns {JSX.Element} Pricing component
+ */
 const Pricing = () => {
   const plans = [
     {

@@ -1,3 +1,8 @@
+/**
+ * Benefits section component displaying product advantages
+ * 
+ * @returns {JSX.Element} Benefits component
+ */
 const Benefits = () => {
   const benefits = [
     {
