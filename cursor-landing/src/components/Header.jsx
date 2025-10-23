@@ -2,7 +2,15 @@ import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const location = useLocation();
-  const isHome = location.pathname === '/';
+
+  const getLinkClasses = (path) => {
+    const isActive = location.pathname === path;
+    return `relative font-medium transition ${
+      isActive 
+        ? 'text-blue-600 after:content-[""] after:absolute after:bottom-[-8px] after:left-0 after:w-full after:h-0.5 after:bg-gradient-to-r after:from-blue-600 after:to-purple-600' 
+        : 'text-gray-700 hover:text-blue-600'
+    }`;
+  };
 
   return (
     <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm">
@@ -16,28 +24,12 @@ const Header = () => {
           </Link>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 transition">
+            <Link to="/" className={getLinkClasses('/')}>
               Home
             </Link>
-            <Link to="/sobre" className="text-gray-700 hover:text-blue-600 transition">
+            <Link to="/sobre" className={getLinkClasses('/sobre')}>
               Sobre
             </Link>
-            {isHome && (
-              <>
-                <a href="#features" className="text-gray-700 hover:text-blue-600 transition">
-                  Funcionalidades
-                </a>
-                <a href="#benefits" className="text-gray-700 hover:text-blue-600 transition">
-                  Vantagens
-                </a>
-                <a href="#why-use" className="text-gray-700 hover:text-blue-600 transition">
-                  Por que usar
-                </a>
-                <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition">
-                  Preços
-                </a>
-              </>
-            )}
           </div>
           
           <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg transition">
