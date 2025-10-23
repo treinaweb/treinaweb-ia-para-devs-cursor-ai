@@ -1,22 +1,21 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
-import Hero from './components/Hero'
-import Features from './components/Features'
-import Benefits from './components/Benefits'
-import WhyUse from './components/WhyUse'
-import Pricing from './components/Pricing'
 import Footer from './components/Footer'
+import Home from './pages/Home'
+import About from './pages/About'
 
 function App() {
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <Hero />
-      <Features />
-      <Benefits />
-      <WhyUse />
-      <Pricing />
-      <Footer />
-    </div>
+    <Router>
+      <div className="min-h-screen bg-white">
+        <Header />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/sobre" element={<About />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   )
 }
 
