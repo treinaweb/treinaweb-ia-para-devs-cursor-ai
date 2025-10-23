@@ -1,0 +1,30 @@
+---
+alwaysApply: true
+---
+
+# Webhook Debugger - Project Structure
+
+## Overview
+This is a webhook debugger application built with Next.js 16, React 19, and TypeScript. The application allows users to receive, inspect, and debug webhook requests in real-time.
+
+## Tech Stack
+- **Framework**: Next.js 16 (App Router)
+- **UI Library**: React 19
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **Icons**: lucide-react
+- **Data Storage**: Redis
+- **Linting**: ESLint with Next.js config
+
+## Project Structure
+- [src/app/](mdc:src/app/) - Next.js App Router pages and layouts
+- [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout
+- [src/app/page.tsx](mdc:src/app/page.tsx) - Home page
+- [public/](mdc:public/) - Static assets
+
+## Key Principles
+1. All code must be written in English
+2. All user-facing messages and responses in Portuguese
+3. Use TypeScript strict mode
+4. Follow Next.js 16 App Router conventions
+5. Use Server Components by default, Client Components only when needed

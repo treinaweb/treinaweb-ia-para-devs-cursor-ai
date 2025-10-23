@@ -1,0 +1,132 @@
+---
+globs: *.tsx,src/components/**/*
+description: UI components and styling guidelines including lucide-react icons
+---
+
+# UI Components and Styling
+
+## Icons with lucide-react
+Always use lucide-react for icons throughout the application.
+
+### Installation
+```bash
+npm install lucide-react
+```
+
+### Usage
+1. Import icons as named imports
+2. Use consistent sizing (size prop)
+3. Apply consistent colors via className
+4. Use semantic icon names
+
+```typescript
+import { Webhook, Copy, Trash2, RefreshCw, CheckCircle } from 'lucide-react';
+
+/**
+ * A webhook card component displaying webhook information.
+ *
+ * @component
+ * @param props - The component props
+ * @param props.webhook - The webhook data to display
+ */
+export function WebhookCard({ webhook }: WebhookCardProps) {
+  return (
+    <div className="card">
+      <Webhook size={24} className="text-blue-500" />
+      <h3>{webhook.name}</h3>
+      <button>
+        <Copy size={16} />
+        Copy URL
+      </button>
+    </div>
+  );
+}
+```
+
+### Common Icons for Webhook Debugger
+- `Webhook` - Webhook icon
+- `Copy` - Copy to clipboard
+- `Trash2` - Delete
+- `RefreshCw` - Refresh/Reload
+- `CheckCircle` - Success state
+- `XCircle` - Error state
+- `AlertCircle` - Warning
+- `Clock` - Timestamp
+- `Code` - Code/JSON view
+- `Eye` - View details
+- `Settings` - Configuration
+- `Download` - Export data
+- `Send` - Send/Submit
+
+## Tailwind CSS Guidelines
+1. Use Tailwind utility classes for styling
+2. Create reusable component classes when needed
+3. Follow mobile-first responsive design
+4. Use consistent spacing scale
+5. Leverage Tailwind's dark mode utilities
+
+### Color Scheme
+- Primary: blue-500 to blue-600
+- Success: green-500
+- Error: red-500
+- Warning: yellow-500
+- Neutral: gray-100 to gray-900
+
+## Component Structure
+Organize components in a logical structure:
+
+```
+src/
+  components/
+    ui/           # Reusable UI primitives
+      Button.tsx
+      Card.tsx
+      Input.tsx
+    webhook/      # Webhook-specific components
+      WebhookCard.tsx
+      WebhookList.tsx
+      RequestViewer.tsx
+```
+
+## Accessibility
+1. Use semantic HTML elements
+2. Include proper ARIA labels
+3. Ensure keyboard navigation
+4. Maintain color contrast ratios
+5. Add alt text for icons when needed
+
+```typescript
+<button
+  onClick={handleCopy}
+  aria-label="Copy webhook URL to clipboard"
+  className="btn-icon"
+>
+  <Copy size={16} aria-hidden="true" />
+  <span className="sr-only">Copy URL</span>
+</button>
+```
+
+## Dark Mode Support
+Plan for dark mode from the start:
+
+```typescript
+<div className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+  <Webhook className="text-blue-500 dark:text-blue-400" />
+</div>
+```
+
+## Loading States
+Use lucide-react icons for loading states:
+
+```typescript
+import { Loader2 } from 'lucide-react';
+
+<button disabled={isLoading}>
+  {isLoading ? (
+    <Loader2 className="animate-spin" size={16} />
+  ) : (
+    <Send size={16} />
+  )}
+  {isLoading ? 'Sending...' : 'Send'}
+</button>
+```

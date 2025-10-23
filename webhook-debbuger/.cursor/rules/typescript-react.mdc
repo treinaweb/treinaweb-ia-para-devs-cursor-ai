@@ -1,0 +1,54 @@
+---
+globs: *.ts,*.tsx
+---
+
+# TypeScript and React Guidelines
+
+## TypeScript Best Practices
+1. Always use explicit type annotations for function parameters and return types
+2. Prefer `interface` over `type` for object shapes
+3. Use strict TypeScript configuration
+4. Avoid `any` - use `unknown` when type is truly unknown
+5. Use const assertions when appropriate
+6. Prefer named exports over default exports for components
+
+## React Best Practices
+1. **Server Components First**: Use Server Components by default
+2. **Client Components**: Only mark as "use client" when necessary:
+   - Using hooks (useState, useEffect, etc.)
+   - Handling browser events
+   - Using browser-only APIs
+3. **Component Structure**:
+   - One component per file
+   - Co-locate related types in the same file
+   - Use functional components with TypeScript
+4. **Hooks**:
+   - Follow Rules of Hooks
+   - Custom hooks must start with "use"
+   - Keep hooks logic simple and focused
+
+## Next.js App Router Patterns
+1. Use file-based routing in `src/app/`
+2. Use `loading.tsx` for loading states
+3. Use `error.tsx` for error boundaries
+4. Use `layout.tsx` for shared layouts
+5. Leverage Server Actions for mutations
+6. Use `use client` directive only when necessary
+
+## Example Component Structure
+
+```typescript
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary';
+}
+
+export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+  return (
+    <button onClick={onClick} className={variant}>
+      {label}
+    </button>
+  );
+}
+```

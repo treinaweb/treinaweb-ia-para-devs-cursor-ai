@@ -1,0 +1,112 @@
+---
+description: Guidelines for Redis integration and data storage patterns
+---
+
+# Redis Storage Guidelines
+
+## Overview
+Redis is used as the primary data storage for webhook data, providing fast access and automatic expiration capabilities.
+
+## Connection Management
+1. Use a single Redis client instance (singleton pattern)
+2. Handle connection errors gracefully
+3. Implement connection retry logic
+4. Close connections properly on application shutdown
+
+## Data Structure Patterns
+
+### Key Naming Convention
+Use descriptive, hierarchical key names:
+- `webhook:{id}` - Individual webhook data
+- `webhook:{id}:requests` - List of requests for a webhook
+- `webhook:{id}:request:{requestId}` - Individual request data
+- `session:{sessionId}` - User session data
+
+### Data Types Usage
+1. **Strings**: Simple key-value pairs, JSON serialized objects
+2. **Hashes**: Structured data with multiple fields
+3. **Lists**: Ordered collections (recent requests, logs)
+4. **Sorted Sets**: Time-ordered data (requests by timestamp)
+5. **Sets**: Unique collections (webhook IDs)
+
+## Expiration Strategy
+Set appropriate TTL (Time To Live) for all keys:
+- Webhook data: 24 hours (configurable)
+- Request data: 24 hours
+- Session data: 7 days
+- Temporary data: 1 hour
+
+```typescript
+/**
+ * Stores webhook data in Redis with automatic expiration.
+ *
+ * @param webhookId - The unique identifier of the webhook
+ * @param data - The webhook data to store
+ * @param ttl - Time to live in seconds (default: 86400 = 24 hours)
+ * @returns A promise that resolves when data is stored
+ */
+async function storeWebhook(
+  webhookId: string,
+  data: WebhookData,
+  ttl: number = 86400
+): Promise<void> {
+  const key = `webhook:${webhookId}`;
+  await redis.setex(key, ttl, JSON.stringify(data));
+}
+```
+
+## Best Practices
+1. **Serialization**: Always serialize/deserialize complex objects as JSON
+2. **Error Handling**: Wrap Redis operations in try-catch blocks
+3. **Transactions**: Use MULTI/EXEC for atomic operations
+4. **Pipelining**: Batch multiple commands for better performance
+5. **Memory Management**: Monitor Redis memory usage and set maxmemory policy
+
+## Example Implementation
+
+```typescript
+import { Redis } from 'ioredis';
+
+/**
+ * Redis client singleton instance.
+ */
+const redis = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  retryStrategy: (times: number) => {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+});
+
+/**
+ * Stores a webhook request in Redis.
+ *
+ * @param webhookId - The webhook identifier
+ * @param request - The request data
+ * @returns A promise that resolves to the request ID
+ */
+export async function storeWebhookRequest(
+  webhookId: string,
+  request: WebhookRequest
+): Promise<string> {
+  const requestId = generateId();
+  const key = `webhook:${webhookId}:request:${requestId}`;
+  
+  // Store request data with 24-hour expiration
+  await redis.setex(key, 86400, JSON.stringify(request));
+  
+  // Add to requests list
+  await redis.lpush(`webhook:${webhookId}:requests`, requestId);
+  await redis.ltrim(`webhook:${webhookId}:requests`, 0, 99); // Keep last 100
+  
+  return requestId;
+}
+```
+
+## Environment Variables
+Required Redis configuration:
+- `REDIS_HOST` - Redis server host
+- `REDIS_PORT` - Redis server port
+- `REDIS_PASSWORD` - Redis password (if required)
+- `REDIS_TLS` - Enable TLS connection (production)

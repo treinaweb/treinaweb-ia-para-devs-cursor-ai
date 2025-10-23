@@ -1,0 +1,206 @@
+---
+globs: src/app/api/**/*,**/route.ts
+---
+
+# API Routes and Server Actions
+
+## Next.js App Router API Routes
+Use Route Handlers for API endpoints in the App Router.
+
+### File Structure
+```
+src/app/api/
+  webhooks/
+    route.ts          # GET /api/webhooks, POST /api/webhooks
+    [id]/
+      route.ts        # GET/DELETE /api/webhooks/[id]
+      requests/
+        route.ts      # GET /api/webhooks/[id]/requests
+```
+
+### Route Handler Pattern
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server';
+import { redis } from '@/lib/redis';
+
+/**
+ * Handles GET requests to fetch all webhooks.
+ *
+ * @param request - The incoming request object
+ * @returns A JSON response with webhooks data
+ */
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  try {
+    const webhooks = await fetchWebhooksFromRedis();
+    
+    return NextResponse.json(
+      { webhooks },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error fetching webhooks:', error);
+    
+    return NextResponse.json(
+      { error: 'Failed to fetch webhooks' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Handles POST requests to create a new webhook.
+ *
+ * @param request - The incoming request object
+ * @returns A JSON response with the created webhook
+ */
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  try {
+    const body = await request.json();
+    const webhook = await createWebhookInRedis(body);
+    
+    return NextResponse.json(
+      { webhook },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Error creating webhook:', error);
+    
+    return NextResponse.json(
+      { error: 'Failed to create webhook' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+### Dynamic Routes
+
+```typescript
+interface RouteParams {
+  params: {
+    id: string;
+  };
+}
+
+/**
+ * Handles GET requests to fetch a specific webhook.
+ *
+ * @param request - The incoming request object
+ * @param context - Route context containing params
+ * @returns A JSON response with webhook data
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: RouteParams
+): Promise<NextResponse> {
+  try {
+    const webhook = await fetchWebhookById(params.id);
+    
+    if (!webhook) {
+      return NextResponse.json(
+        { error: 'Webhook not found' },
+        { status: 404 }
+      );
+    }
+    
+    return NextResponse.json({ webhook });
+  } catch (error) {
+    console.error('Error fetching webhook:', error);
+    
+    return NextResponse.json(
+      { error: 'Failed to fetch webhook' },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Server Actions
+Use Server Actions for form submissions and mutations.
+
+```typescript
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redis } from '@/lib/redis';
+
+/**
+ * Creates a new webhook endpoint.
+ *
+ * @param formData - The form data containing webhook details
+ * @returns The created webhook object
+ */
+export async function createWebhook(formData: FormData): Promise<Webhook> {
+  const name = formData.get('name') as string;
+  
+  // Validation
+  if (!name || name.trim().length === 0) {
+    throw new Error('Webhook name is required');
+  }
+  
+  // Create webhook in Redis
+  const webhook = await createWebhookInRedis({ name });
+  
+  // Revalidate the webhooks page
+  revalidatePath('/webhooks');
+  
+  return webhook;
+}
+```
+
+## Error Handling
+1. Always wrap async operations in try-catch
+2. Log errors for debugging
+3. Return appropriate HTTP status codes
+4. Provide meaningful error messages
+5. Don't expose sensitive information in error responses
+
+## Response Standards
+- **200 OK**: Successful GET request
+- **201 Created**: Successful POST request
+- **204 No Content**: Successful DELETE request
+- **400 Bad Request**: Invalid input
+- **404 Not Found**: Resource not found
+- **500 Internal Server Error**: Server error
+
+## Webhook Endpoint Pattern
+The main webhook receiver endpoint should:
+1. Accept any HTTP method
+2. Store the complete request data in Redis
+3. Return quickly (within 5 seconds)
+4. Use a unique webhook ID in the URL
+
+```typescript
+/**
+ * Receives and stores incoming webhook requests.
+ *
+ * @param request - The incoming webhook request
+ * @param context - Route context with webhook ID
+ * @returns A success response
+ */
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { webhookId: string } }
+): Promise<NextResponse> {
+  const webhookId = params.webhookId;
+  
+  // Capture request data
+  const requestData = {
+    method: request.method,
+    headers: Object.fromEntries(request.headers),
+    body: await request.text(),
+    timestamp: Date.now(),
+    url: request.url,
+  };
+  
+  // Store in Redis
+  await storeWebhookRequest(webhookId, requestData);
+  
+  // Return success response
+  return NextResponse.json(
+    { message: 'Webhook received successfully' },
+    { status: 200 }
+  );
+}
+```
